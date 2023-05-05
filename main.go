@@ -36,6 +36,10 @@ func hello(c echo.Context) error {
 func redisHandler(echoCtx echo.Context) error {
 	ctx := context.Background()
 
+	dispFMT := func(f string, key string, v int) string {
+		return fmt.Sprintf("%10s '%v': %3d\n", f, key, v)
+	}
+
 	key1 := "k"
 
 	rdb := redis.NewClient(&redis.Options{
@@ -52,19 +56,25 @@ func redisHandler(echoCtx echo.Context) error {
 	if err != nil {
 		panic(err)
 	}
-	retStr += fmt.Sprintf("Set '%v': %v\n", key1, val)
+	retStr += dispFMT("Set", key1, val)
 
 	val, err = repo.Get(ctx, key1)
 	if err != nil {
 		panic(err)
 	}
-	retStr += fmt.Sprintf("Get '%v': %v\n", key1, val)
+	retStr += dispFMT("Get", key1, val)
 
 	val, err = repo.CntUp(ctx, key1)
 	if err != nil {
 		panic(err)
 	}
-	retStr += fmt.Sprintf("CntUp '%v': %v\n", key1, val)
+	retStr += dispFMT("CntUp", key1, val)
+
+	val, err = repo.CntDown(ctx, key1)
+	if err != nil {
+		panic(err)
+	}
+	retStr += dispFMT("CntDown", key1, val)
 
 	echoCtx.String(http.StatusOK, retStr)
 

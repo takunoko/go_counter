@@ -36,6 +36,20 @@ func (dr *cntRepo) CntUp(ctx context.Context, key string) (int, error) {
 	return intVal, nil
 }
 
+func (dr *cntRepo) CntDown(ctx context.Context, key string) (int, error) {
+	val, err := dr.RCli.Decr(ctx, key).Result()
+	if err != nil {
+		return 0, err
+	}
+
+	intVal, err := strconv.Atoi(strconv.FormatInt(val, 10))
+	if err != nil {
+		return 0, err
+	}
+
+	return intVal, nil
+}
+
 func (dr *cntRepo) Get(ctx context.Context, key string) (int, error) {
 	val, err := dr.RCli.Get(ctx, key).Result()
 	if err == redis.Nil {
