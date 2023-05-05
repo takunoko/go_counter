@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/redis/go-redis/v9"
+	"go_web_counter/config"
 	myRedis "go_web_counter/infrastructure/redis"
 	"net/http"
 )
@@ -23,7 +24,7 @@ func main() {
 	e.GET("/redis_test", cntHandler)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)))
 }
 
 // Handler
@@ -39,17 +40,16 @@ func cntHandler(echoCtx echo.Context) error {
 		return fmt.Sprintf("%10s '%v': %3d\n", f, key, v)
 	}
 
-	key1 := "k"
-
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "redis:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     config.RedisAddr,
+		Password: config.RedisPass, // no password set
+		DB:       config.RedisDB,   // use default DB
 	})
 	repo := myRedis.NewDataRepository(rdb)
 
 	retStr := ""
 
+	key1 := "k"
 	val := 111
 	err := repo.Set(ctx, key1, val)
 	if err != nil {
