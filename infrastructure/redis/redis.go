@@ -18,29 +18,32 @@ func RedisClientTest(echoCtx echo.Context) error {
 		DB:       0,  // use default DB
 	})
 
-	err := rdb.Set(ctx, "k", "123", 0).Err()
+	key1 := "k"
+	key2 := "k2"
+
+	err := rdb.Set(ctx, key1, "123", 0).Err()
 	if err != nil {
 		panic(err)
 	}
 
-	retStr := "set key: k, val: 123\n"
+	retStr := fmt.Sprintf("set key: %v, val: 123\n", key1)
 
-	val, err := rdb.Get(ctx, "k").Result()
+	val, err := rdb.Get(ctx, key1).Result()
 	if err != nil {
 		panic(err)
 	}
-	retStr += fmt.Sprintf("get key: k, val: %s\n", val)
+	retStr += fmt.Sprintf("get key: %v, val: %s\n", key1, val)
 
-	val = strconv.FormatInt(rdb.Incr(ctx, "key").Val(), 10)
-	retStr += fmt.Sprintf("incr key: k, val: %s\n", val)
+	incrVal := strconv.FormatInt(rdb.Incr(ctx, key1).Val(), 10)
+	retStr += fmt.Sprintf("incr key: %v, val: %s\n", key1, incrVal)
 
-	val2, err := rdb.Get(ctx, "key2").Result()
+	val2, err := rdb.Get(ctx, key2).Result()
 	if err == redis.Nil {
-		retStr += "key: key2 is not found\n"
+		retStr += fmt.Sprintf("key: %v is not found\n", key2)
 	} else if err != nil {
 		panic(err)
 	} else {
-		retStr += fmt.Sprintf("incr key2: k, val: %s\n", val2)
+		retStr += fmt.Sprintf("incr %v, val: %s\n", key2, val2)
 	}
 
 	echoCtx.String(http.StatusOK, retStr)
