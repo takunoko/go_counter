@@ -11,7 +11,7 @@ type cntRepo struct {
 	RCli *redis.Client
 }
 
-func NewDataRepository(rCli *redis.Client) cnt.CntRepository {
+func NewDataRepository(rCli *redis.Client) cnt.ICntRepository {
 	return &cntRepo{
 		RCli: rCli,
 	}

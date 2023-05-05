@@ -19,21 +19,20 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// Routes
-	e.GET("/", hello)
-	// Routes
-	e.GET("/redis_test", redisHandler)
+	e.GET("/", helloHandler)
+	e.GET("/redis_test", cntHandler)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
 }
 
 // Handler
-func hello(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, New-3 World!")
+func helloHandler(c echo.Context) error {
+	return c.String(http.StatusOK, "Hello, New World!")
 }
 
-// Redis Hnadler
-func redisHandler(echoCtx echo.Context) error {
+// Handler
+func cntHandler(echoCtx echo.Context) error {
 	ctx := context.Background()
 
 	dispFMT := func(f string, key string, v int) string {
