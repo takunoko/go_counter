@@ -2,53 +2,52 @@ package myRedis
 
 import (
 	"context"
-	"fmt"
-	"github.com/labstack/echo/v4"
 	"github.com/redis/go-redis/v9"
-	"net/http"
+	"go_web_counter/domain/cnt"
 	"strconv"
 )
 
-var ctx = context.Background()
+type cntRepo struct {
+	RCli *redis.Client
+}
 
-func RedisClientTest(echoCtx echo.Context) error {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "redis:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
+func NewDataRepository(rCli *redis.Client) cnt.CntRepository {
+	return &cntRepo{
+		RCli: rCli,
+	}
+}
 
-	key1 := "k"
-	key2 := "k2"
+func (dr *cntRepo) Set(ctx context.Context, key string, val int) error {
+	s := strconv.Itoa(val)
+	return dr.RCli.Set(ctx, key, s, 0).Err()
+}
 
-	err := rdb.Set(ctx, key1, "123", 0).Err()
+func (dr *cntRepo) CntUp(ctx context.Context, key string) (int, error) {
+	val, err := dr.RCli.Incr(ctx, key).Result()
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
-	retStr := fmt.Sprintf("set key: %v, val: 123\n", key1)
-
-	val, err := rdb.Get(ctx, key1).Result()
+	intVal, err := strconv.Atoi(strconv.FormatInt(val, 10))
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
-	retStr += fmt.Sprintf("get key: %v, val: %s\n", key1, val)
 
-	incrVal := strconv.FormatInt(rdb.Incr(ctx, key1).Val(), 10)
-	retStr += fmt.Sprintf("incr key: %v, val: %s\n", key1, incrVal)
+	return intVal, nil
+}
 
-	val2, err := rdb.Get(ctx, key2).Result()
+func (dr *cntRepo) Get(ctx context.Context, key string) (int, error) {
+	val, err := dr.RCli.Get(ctx, key).Result()
 	if err == redis.Nil {
-		retStr += fmt.Sprintf("key: %v is not found\n", key2)
+		return 0, err
 	} else if err != nil {
-		panic(err)
-	} else {
-		retStr += fmt.Sprintf("incr %v, val: %s\n", key2, val2)
+		return 0, err
 	}
 
-	echoCtx.String(http.StatusOK, retStr)
+	cnt, err := strconv.Atoi(val)
+	if err != nil {
+		return 0, err
+	}
 
-	// Output: key value
-	// key2 does not exist
-	return nil
+	return cnt, nil
 }
