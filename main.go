@@ -7,7 +7,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/redis/go-redis/v9"
 	"go_web_counter/config"
-	"go_web_counter/domain/cnt"
 	myRedis "go_web_counter/infrastructure/redis"
 	"net/http"
 )
@@ -41,18 +40,18 @@ const (
 )
 
 // TODO: DIしたい
-func getRedisRepo() cnt.ICntRepository {
-	rdb := redis.NewClient(&redis.Options{
+func getRedisCli() *redis.Client {
+	return redis.NewClient(&redis.Options{
 		Addr:     config.RedisAddr,
-		Password: config.RedisPass, // no password set
-		DB:       config.RedisDB,   // use default DB
+		Password: config.RedisPass,
+		DB:       config.RedisDB,
 	})
-	return myRedis.NewDataRepository(rdb)
 }
 
 func getHandler(echoCtx echo.Context) error {
 	ctx := context.Background()
-	repo := getRedisRepo()
+	rCli := getRedisCli()
+	repo := myRedis.NewDataRepository(rCli)
 
 	val, err := repo.Get(ctx, Key)
 	if err != nil {
@@ -68,7 +67,8 @@ func getHandler(echoCtx echo.Context) error {
 
 func resetHandler(echoCtx echo.Context) error {
 	ctx := context.Background()
-	repo := getRedisRepo()
+	rCli := getRedisCli()
+	repo := myRedis.NewDataRepository(rCli)
 
 	initialVal := 0
 	err := repo.Set(ctx, Key, initialVal)
@@ -85,7 +85,8 @@ func resetHandler(echoCtx echo.Context) error {
 
 func cntUpHandler(echoCtx echo.Context) error {
 	ctx := context.Background()
-	repo := getRedisRepo()
+	rCli := getRedisCli()
+	repo := myRedis.NewDataRepository(rCli)
 
 	val, err := repo.CntUp(ctx, Key)
 	if err != nil {
@@ -101,7 +102,8 @@ func cntUpHandler(echoCtx echo.Context) error {
 
 func cntDownHandler(echoCtx echo.Context) error {
 	ctx := context.Background()
-	repo := getRedisRepo()
+	rCli := getRedisCli()
+	repo := myRedis.NewDataRepository(rCli)
 
 	val, err := repo.CntDown(ctx, Key)
 	if err != nil {
