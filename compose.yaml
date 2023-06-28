@@ -6,7 +6,7 @@ services:
     container_name: app
     build: .
     ports:
-      - 8080:1323
+      - "8080:1323"
     volumes:
       - .:/app
     depends_on:
