@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/redis/go-redis/v9"
 	"go_web_counter/config"
+	"go_web_counter/domain/cnt"
 	myRedis "go_web_counter/infrastructure/redis"
 	"net/http"
 )
@@ -20,8 +21,11 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// Routes
-	e.GET("/", helloHandler)
-	e.GET("/redis_test", cntHandler)
+	e.GET("/hello", helloHandler)
+	e.GET("/", getHandler)
+	e.GET("/reset", resetHandler)
+	e.GET("/cnt_up", cntUpHandler)
+	e.GET("/cnt_down", cntDownHandler)
 
 	// Start server
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)))
@@ -29,53 +33,88 @@ func main() {
 
 // Handler
 func helloHandler(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, New World!")
+	return c.String(http.StatusOK, "Hello, World!")
 }
 
-// Handler
-func cntHandler(echoCtx echo.Context) error {
-	ctx := context.Background()
+const (
+	Key = "cnt_key"
+)
 
-	dispFMT := func(f string, key string, v int) string {
-		return fmt.Sprintf("%10s '%v': %3d\n", f, key, v)
-	}
-
+// TODO: DIしたい
+func getRedisRepo() cnt.ICntRepository {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     config.RedisAddr,
 		Password: config.RedisPass, // no password set
 		DB:       config.RedisDB,   // use default DB
 	})
-	repo := myRedis.NewDataRepository(rdb)
+	return myRedis.NewDataRepository(rdb)
+}
 
-	retStr := ""
+func getHandler(echoCtx echo.Context) error {
+	ctx := context.Background()
+	repo := getRedisRepo()
 
-	key1 := "k"
-	val := 111
-	err := repo.Set(ctx, key1, val)
+	val, err := repo.Get(ctx, Key)
 	if err != nil {
 		panic(err)
 	}
-	retStr += dispFMT("Set", key1, val)
 
-	val, err = repo.Get(ctx, key1)
-	if err != nil {
-		panic(err)
-	}
-	retStr += dispFMT("Get", key1, val)
+	dispStr := fmtDisp("CntGet", Key, val)
 
-	val, err = repo.CntUp(ctx, key1)
-	if err != nil {
-		panic(err)
-	}
-	retStr += dispFMT("CntUp", key1, val)
-
-	val, err = repo.CntDown(ctx, key1)
-	if err != nil {
-		panic(err)
-	}
-	retStr += dispFMT("CntDown", key1, val)
-
-	echoCtx.String(http.StatusOK, retStr)
+	echoCtx.String(http.StatusOK, dispStr)
 
 	return nil
+}
+
+func resetHandler(echoCtx echo.Context) error {
+	ctx := context.Background()
+	repo := getRedisRepo()
+
+	initialVal := 0
+	err := repo.Set(ctx, Key, initialVal)
+	if err != nil {
+		panic(err)
+	}
+
+	dispStr := fmtDisp("Set", Key, initialVal)
+
+	echoCtx.String(http.StatusOK, dispStr)
+
+	return nil
+}
+
+func cntUpHandler(echoCtx echo.Context) error {
+	ctx := context.Background()
+	repo := getRedisRepo()
+
+	val, err := repo.CntUp(ctx, Key)
+	if err != nil {
+		panic(err)
+	}
+
+	dispStr := fmtDisp("CntUp", Key, val)
+
+	echoCtx.String(http.StatusOK, dispStr)
+
+	return nil
+}
+
+func cntDownHandler(echoCtx echo.Context) error {
+	ctx := context.Background()
+	repo := getRedisRepo()
+
+	val, err := repo.CntDown(ctx, Key)
+	if err != nil {
+		panic(err)
+	}
+
+	dispStr := fmtDisp("CntDown", Key, val)
+
+	echoCtx.String(http.StatusOK, dispStr)
+
+	return nil
+}
+
+func fmtDisp(f string, key string, v int) string {
+	return fmt.Sprintf("%10s '%v': %3d\n", f, key, v)
 }
