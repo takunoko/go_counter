@@ -4,22 +4,16 @@ import (
 	"context"
 	"fmt"
 	"github.com/redis/go-redis/v9"
-	"os"
+)
+
+const (
+	testRedisHost = "127.0.0.1"
+	testRedisPort = "6379"
 )
 
 func OpenTestRedis() *redis.Client {
-	redisHost := os.Getenv("TEST_REDIS_HOST")
-	if redisHost == "" {
-		redisHost = "127.0.0.1" // Default
-	}
-	redisPort := os.Getenv("TEST_REDIS_PORT")
-	if redisPort == "" {
-		redisPort = "6379" // Default
-	}
-	fmt.Printf("Host: %s, Port: %s", redisHost, redisPort)
-
 	testRCli := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", redisHost, redisPort),
+		Addr:     fmt.Sprintf("%s:%s", testRedisHost, testRedisPort),
 		Password: "",
 		DB:       0,
 	})
