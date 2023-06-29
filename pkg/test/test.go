@@ -2,24 +2,21 @@ package test
 
 import (
 	"context"
+	"fmt"
 	"github.com/redis/go-redis/v9"
-	"go_web_counter/config"
-	"testing"
 )
 
 const (
-	testRedisAddress = "127.0.0.1:6379" // テストのGoはローカルで実行なためIPで指定
-	testRedisPass    = config.RedisPass
-	testRedisDBNo    = 9 // テスト用で分ける
+	testRedisHost = "127.0.0.1"
+	testRedisPort = "6379"
+	testRedisDB   = 9
 )
 
-func OpenTestRedis(t *testing.T) *redis.Client {
-	t.Parallel()
-
+func OpenTestRedis() *redis.Client {
 	testRCli := redis.NewClient(&redis.Options{
-		Addr:     testRedisAddress,
-		Password: testRedisPass,
-		DB:       testRedisDBNo,
+		Addr:     fmt.Sprintf("%s:%s", testRedisHost, testRedisPort),
+		Password: "",
+		DB:       testRedisDB,
 	})
 
 	// データの初期化

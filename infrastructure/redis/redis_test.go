@@ -9,7 +9,7 @@ import (
 )
 
 func Test_cntRepo_Set(t *testing.T) {
-	rCli := test.OpenTestRedis(t)
+	rCli := test.OpenTestRedis()
 	rKey := "set"
 
 	type fields struct {
@@ -50,7 +50,7 @@ func Test_cntRepo_Set(t *testing.T) {
 }
 
 func Test_cntRepo_CntUp(t *testing.T) {
-	rCli := test.OpenTestRedis(t)
+	rCli := test.OpenTestRedis()
 	key0 := "cnt_up_0"
 	key1 := "cnt_up_1"
 	keyMinus1 := "cnt_up_minus1"
@@ -145,7 +145,7 @@ func Test_cntRepo_CntUp(t *testing.T) {
 }
 
 func Test_cntRepo_CntDown(t *testing.T) {
-	rCli := test.OpenTestRedis(t)
+	rCli := test.OpenTestRedis()
 	key0 := "cnt_down_0"
 	key1 := "cnt_down_1"
 	keyMinus1 := "cnt_down_minus1"
@@ -240,7 +240,7 @@ func Test_cntRepo_CntDown(t *testing.T) {
 }
 
 func Test_cntRepo_Get(t *testing.T) {
-	rCli := test.OpenTestRedis(t)
+	rCli := test.OpenTestRedis()
 	key1 := "get_1"
 	keyStr := "get_str"
 	notExistKey := "get_not_ext"
