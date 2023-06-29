@@ -12,3 +12,5 @@ docker-compose up
   - 開発環境のホットリロード
 - [go-redis](https://github.com/redis/go-redis)
   - Redis操作
+- [GitHub Actions](https://github.co.jp/features/actions)
+  - テストの実行
