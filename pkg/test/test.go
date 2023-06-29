@@ -19,6 +19,7 @@ func OpenTestRedis(t *testing.T) *redis.Client {
 	if redisPort == "" {
 		redisHost = "6379" // Default
 	}
+	fmt.Printf("Host: %s, Port: %s", redisHost, redisPort)
 
 	testRCli := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", redisHost, redisPort),
