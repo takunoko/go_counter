@@ -240,7 +240,7 @@ func Test_cntRepo_CntDown(t *testing.T) {
 }
 
 func Test_cntRepo_Get(t *testing.T) {
-	rCli := test.OpenTestRedis(t)
+	rCli := test.OpenTestRedis()
 	key1 := "get_1"
 	keyStr := "get_str"
 	notExistKey := "get_not_ext"

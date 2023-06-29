@@ -5,12 +5,9 @@ import (
 	"fmt"
 	"github.com/redis/go-redis/v9"
 	"os"
-	"testing"
 )
 
-func OpenTestRedis(t *testing.T) *redis.Client {
-	t.Parallel()
-
+func OpenTestRedis() *redis.Client {
 	redisHost := os.Getenv("TEST_REDIS_HOST")
 	if redisHost == "" {
 		redisHost = "127.0.0.1" // Default
