@@ -6,6 +6,16 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v3
 
@@ -17,5 +27,8 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-#      - name: Test
-#        run: go test -v ./...
+      - name: Test
+        run: go test -v ./...
+        env:
+          TEST_REDIS_HOST: redis
+          TEST_REDIS_PORT: 6379
