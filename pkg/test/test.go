@@ -17,7 +17,7 @@ func OpenTestRedis(t *testing.T) *redis.Client {
 	}
 	redisPort := os.Getenv("TEST_REDIS_PORT")
 	if redisPort == "" {
-		redisHost = "6379" // Default
+		redisPort = "6379" // Default
 	}
 	fmt.Printf("Host: %s, Port: %s", redisHost, redisPort)
 
