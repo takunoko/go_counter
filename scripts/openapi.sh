@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
 INPUT_DIR="openapi"
+CONFIG_DIR="openapi/config"
 OUTPUT_DIR="interface/web"
-## oapi-codegen -generate types,server -package web ${INPUT_DIR}/petstore-expanded.yaml > ${OUTPUT_DIR}/web_gen.go
-oapi-codegen -package web ${INPUT_DIR}/petstore-expanded.yaml > ${OUTPUT_DIR}/web_gen.go
+oapi-codegen --config ${CONFIG_DIR}/types_gen.yaml ${INPUT_DIR}/petstore-expanded.yaml >| ${OUTPUT_DIR}/types_gen.go
+oapi-codegen -generate server -package web ${INPUT_DIR}/petstore-expanded.yaml >| ${OUTPUT_DIR}/server_gen.go

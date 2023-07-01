@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	oapiMiddleware "github.com/deepmap/oapi-codegen/pkg/middleware"
+	"github.com/creasty/defaults"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/redis/go-redis/v9"
@@ -16,21 +16,22 @@ import (
 type apiController struct{}
 
 func (a apiController) GetNum(ctx echo.Context) error {
+	var res web.GetNumResponse
+	Initialize(&res.JSON200)
+
 	currentNum := web.CurrentNum{
 		Num: 8,
 	}
-	json200 := struct {
-		Result web.CurrentNum `json:"result"`
-	}{
-		Result: currentNum,
-	}
-	var res web.GetNumResponse
-	// if err := defaults.Set(&res.JSON200); err != nil {
-	// 	panic(err)
-	// }
-	res.JSON200 = &json200
+
+	res.JSON200.Result = currentNum
 
 	return ctx.JSON(http.StatusOK, res.JSON200)
+}
+
+func Initialize(resVal any) {
+	if err := defaults.Set(resVal); err != nil {
+		panic(err)
+	}
 }
 
 func main() {
@@ -38,11 +39,12 @@ func main() {
 	e := echo.New()
 
 	// OpenApiの定義に従ったリクエストかのバリデーションミドルウェア
-	swagger, err := web.GetSwagger()
-	if err != nil {
-		panic(err)
-	}
-	e.Use(oapiMiddleware.OapiRequestValidator(swagger))
+	// FIXME: 何かしら戻す
+	// swagger, err := web.GetSwagger()
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// e.Use(oapiMiddleware.OapiRequestValidator(swagger))
 
 	// Middleware
 	e.Use(middleware.Logger())
