@@ -3,28 +3,60 @@ package main
 import (
 	"context"
 	"fmt"
+	oapiMiddleware "github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/redis/go-redis/v9"
 	"go_web_counter/config"
 	myRedis "go_web_counter/infrastructure/redis"
+	"go_web_counter/interface/web"
 	"net/http"
 )
+
+type apiController struct{}
+
+func (a apiController) GetNum(ctx echo.Context) error {
+	currentNum := web.CurrentNum{
+		Num: 8,
+	}
+	json200 := struct {
+		Result web.CurrentNum `json:"result"`
+	}{
+		Result: currentNum,
+	}
+	var res web.GetNumResponse
+	// if err := defaults.Set(&res.JSON200); err != nil {
+	// 	panic(err)
+	// }
+	res.JSON200 = &json200
+
+	return ctx.JSON(http.StatusOK, res.JSON200)
+}
 
 func main() {
 	// Echo instance
 	e := echo.New()
 
+	// OpenApiの定義に従ったリクエストかのバリデーションミドルウェア
+	swagger, err := web.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
+	e.Use(oapiMiddleware.OapiRequestValidator(swagger))
+
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// Routes
-	e.GET("/hello", helloHandler)
-	e.GET("/", getHandler)
-	e.GET("/reset", resetHandler)
-	e.GET("/cnt_up", cntUpHandler)
-	e.GET("/cnt_down", cntDownHandler)
+	//// Routes
+	//e.GET("/hello", helloHandler)
+	//e.GET("/", getHandler)
+	//e.GET("/reset", resetHandler)
+	//e.GET("/cnt_up", cntUpHandler)
+	//e.GET("/cnt_down", cntDownHandler)
+
+	api := apiController{}
+	web.RegisterHandlers(e, api)
 
 	// Start server
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)))

@@ -1,0 +1,26 @@
+package: web
+generate:
+  client: true
+  models: true
+output-options:
+  user-templates:
+    client-with-responses.tmpl: |-
+    
+      // --以下レスポンス--
+      // 参考: https://github.com/deepmap/oapi-codegen/blob/v1.8.2/pkg/codegen/templates/client-with-responses.tmpl
+
+      {{range .}}{{$opid := .OperationId}}{{$op := .}}
+      type {{$opid | ucFirst}}Response struct {
+          {{- range getResponseTypeDefinitions .}}
+          {{.TypeName}} {{.Schema.TypeDecl}}
+          {{- end}}
+      }
+      {{end}}
+
+    client.tmpl: |-
+      // --以下クライアント--
+      // テンプレートを空にするためにここにはコメントのみ記載
+      // 参考: https://github.com/deepmap/oapi-codegen/blob/v1.8.2/pkg/codegen/templates/client.tmpl
+
+compatibility:
+  old-merge-schemas: true

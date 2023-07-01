@@ -1,0 +1,48 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Web Counter API
+paths:
+  /num:
+    get:
+      summary: "現在の値取得"
+      responses:
+        '200':
+          description: 現在の値
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - result
+                properties:
+                  result:
+                    $ref: '#/components/schemas/CurrentNum'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    CurrentNum:
+      type: object
+      required:
+        - num
+      properties:
+        num:
+          type: integer
+          description: 現在の値
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
