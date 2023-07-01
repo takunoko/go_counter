@@ -14,3 +14,6 @@ docker-compose up
   - Redis操作
 - [GitHub Actions](https://github.co.jp/features/actions)
   - テストの実行
+- [OpenAPI](https://swagger.io/docs/specification/about/)
+  - APIの定義
+  - [OpenAPI Specification | GitHub](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md)
