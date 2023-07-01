@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	oapiMiddleware "github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/redis/go-redis/v9"
@@ -13,16 +14,14 @@ import (
 )
 
 func main() {
-	// Echo instance
 	e := echo.New()
 
 	// OpenApiの定義に従ったリクエストかのバリデーションミドルウェア
-	// FIXME: 何かしら戻す
-	// swagger, err := web.GetSwagger()
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// e.Use(oapiMiddleware.OapiRequestValidator(swagger))
+	swagger, err := web.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
+	e.Use(oapiMiddleware.OapiRequestValidator(swagger))
 
 	// Middleware
 	e.Use(middleware.Logger())
