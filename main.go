@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/creasty/defaults"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/redis/go-redis/v9"
@@ -12,27 +11,6 @@ import (
 	"go_web_counter/interface/web"
 	"net/http"
 )
-
-type apiController struct{}
-
-func (a apiController) GetNum(ctx echo.Context) error {
-	var res web.GetNumResponse
-	Initialize(&res.JSON200)
-
-	currentNum := web.CurrentNum{
-		Num: 8,
-	}
-
-	res.JSON200.Result = currentNum
-
-	return ctx.JSON(http.StatusOK, res.JSON200)
-}
-
-func Initialize(resVal any) {
-	if err := defaults.Set(resVal); err != nil {
-		panic(err)
-	}
-}
 
 func main() {
 	// Echo instance
@@ -57,8 +35,7 @@ func main() {
 	//e.GET("/cnt_up", cntUpHandler)
 	//e.GET("/cnt_down", cntDownHandler)
 
-	api := apiController{}
-	web.RegisterHandlers(e, api)
+	web.RegisterHandlers(e, web.ApiHandlers{})
 
 	// Start server
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)))
